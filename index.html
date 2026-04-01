@@ -79,7 +79,9 @@
       transition: transform 0.2s;
     }
 
-    .dot:hover { transform: scale(1.3); }
+    .dot:hover {
+      transform: scale(1.3);
+    }
 
     .dot.red {
       background: #ff5f56;
@@ -132,10 +134,23 @@
     }
 
     @keyframes glitch {
-      0%, 100% { text-shadow: 2px 0 red, -2px 0 blue; }
-      25% { text-shadow: -2px 0 cyan, 2px 0 magenta; }
-      50% { text-shadow: 3px 0 lime, -1px 0 yellow; }
-      75% { text-shadow: -3px 0 orange, 1px 0 purple; }
+
+      0%,
+      100% {
+        text-shadow: 2px 0 red, -2px 0 blue;
+      }
+
+      25% {
+        text-shadow: -2px 0 cyan, 2px 0 magenta;
+      }
+
+      50% {
+        text-shadow: 3px 0 lime, -1px 0 yellow;
+      }
+
+      75% {
+        text-shadow: -3px 0 orange, 1px 0 purple;
+      }
     }
 
     .hero-badge {
@@ -282,20 +297,43 @@
     }
 
     @keyframes blink-animation {
-      50% { opacity: 0; }
+      50% {
+        opacity: 0;
+      }
     }
 
     @media (max-width: 700px) {
-      .content { padding: 20px; }
-      h1 { font-size: 1.3rem; }
-      .stat-number { font-size: 1.8rem; }
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+      }
     }
 
     @keyframes fadeMatrix {
-      0% { opacity: 0; transform: translateY(-15px); }
-      20% { opacity: 0.7; }
-      80% { opacity: 0.5; }
-      100% { opacity: 0; transform: translateY(25px); }
+      0% {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+
+      20% {
+        opacity: 0.7;
+      }
+
+      80% {
+        opacity: 0.5;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(25px);
+      }
     }
 
     /* ===== EASTER EGG STYLES ===== */
@@ -305,7 +343,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0, 0, 0, 0.9);
       z-index: 9999;
       justify-content: center;
       align-items: center;
@@ -314,11 +352,36 @@
       color: #0f0;
       text-align: center;
     }
-    #konamiOverlay.show { display: flex; }
-    #konamiOverlay h2 { font-size: 2.5rem; color: #ff4444; margin-bottom: 20px; text-shadow: 0 0 10px red; }
-    #konamiOverlay p  { font-size: 1.1rem; max-width: 600px; line-height: 1.8; color: #aaffaa; }
-    #konamiOverlay .close-egg { margin-top: 30px; padding: 10px 30px; border-radius: 40px;
-      background: #ff4444; border: none; color: #fff; font-size: 1rem; cursor: pointer; font-family: monospace; }
+
+    #konamiOverlay.show {
+      display: flex;
+    }
+
+    #konamiOverlay h2 {
+      font-size: 2.5rem;
+      color: #ff4444;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px red;
+    }
+
+    #konamiOverlay p {
+      font-size: 1.1rem;
+      max-width: 600px;
+      line-height: 1.8;
+      color: #aaffaa;
+    }
+
+    #konamiOverlay .close-egg {
+      margin-top: 30px;
+      padding: 10px 30px;
+      border-radius: 40px;
+      background: #ff4444;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: monospace;
+    }
 
     /* floating toast */
     #toast {
@@ -338,7 +401,11 @@
       transition: opacity 0.4s, transform 0.4s;
       max-width: 320px;
     }
-    #toast.visible { opacity: 1; transform: translateY(0); }
+
+    #toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     /* secret typewriter area */
     #secretCmd {
@@ -354,31 +421,78 @@
       cursor: text;
       outline: none;
     }
-    #secretCmd::placeholder { color: #336633; }
+
+    #secretCmd::placeholder {
+      color: #336633;
+    }
 
     /* shake animation */
     @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-8px) rotate(-1deg); }
-      40% { transform: translateX(8px) rotate(1deg); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-8px) rotate(-1deg);
+      }
+
+      40% {
+        transform: translateX(8px) rotate(1deg);
+      }
+
+      60% {
+        transform: translateX(-5px);
+      }
+
+      80% {
+        transform: translateX(5px);
+      }
     }
-    .shaking { animation: shake 0.5s ease; }
+
+    .shaking {
+      animation: shake 0.5s ease;
+    }
 
     /* cursor blink in secret terminal */
-    .cursor-blink { animation: blink-animation 0.8s step-end infinite; }
+    .cursor-blink {
+      animation: blink-animation 0.8s step-end infinite;
+    }
 
     /* rainbow mode */
-    body.rainbow-mode { animation: rainbowBg 3s linear infinite; }
+    body.rainbow-mode {
+      animation: rainbowBg 3s linear infinite;
+    }
+
     @keyframes rainbowBg {
-      0%   { background: linear-gradient(135deg,#ff000033,#1a1f2e); }
-      16%  { background: linear-gradient(135deg,#ff880033,#1a1f2e); }
-      33%  { background: linear-gradient(135deg,#ffff0033,#1a1f2e); }
-      50%  { background: linear-gradient(135deg,#00ff0033,#1a1f2e); }
-      66%  { background: linear-gradient(135deg,#0000ff33,#1a1f2e); }
-      83%  { background: linear-gradient(135deg,#ff00ff33,#1a1f2e); }
-      100% { background: linear-gradient(135deg,#ff000033,#1a1f2e); }
+      0% {
+        background: linear-gradient(135deg, #ff000033, #1a1f2e);
+      }
+
+      16% {
+        background: linear-gradient(135deg, #ff880033, #1a1f2e);
+      }
+
+      33% {
+        background: linear-gradient(135deg, #ffff0033, #1a1f2e);
+      }
+
+      50% {
+        background: linear-gradient(135deg, #00ff0033, #1a1f2e);
+      }
+
+      66% {
+        background: linear-gradient(135deg, #0000ff33, #1a1f2e);
+      }
+
+      83% {
+        background: linear-gradient(135deg, #ff00ff33, #1a1f2e);
+      }
+
+      100% {
+        background: linear-gradient(135deg, #ff000033, #1a1f2e);
+      }
     }
 
     /* floating snakes */
@@ -389,9 +503,17 @@
       z-index: 8000;
       animation: floatUp 4s ease-in forwards;
     }
+
     @keyframes floatUp {
-      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
-      100% { opacity: 0; transform: translateY(-90vh) rotate(720deg); }
+      0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-90vh) rotate(720deg);
+      }
     }
 
     /* secret badge revealed */
@@ -407,7 +529,10 @@
       font-weight: bold;
       font-size: 1.1rem;
     }
-    .secret-badge.visible { display: block; }
+
+    .secret-badge.visible {
+      display: block;
+    }
   </style>
 </head>
 
@@ -480,22 +605,24 @@
 
         <!-- Fake compilation log -->
         <div class="code-block">
-<span style="color:#ffaa66;">➜ BS2000 $</span> ./configure --host=bs2000 --enable-optimizations --with-april-fools<br>
-<span style="color:#6eff8e;">checking for gcc... no</span><br>
-<span style="color:#6eff8e;">checking for cc... bs2000-cc (ancient but noble)</span><br>
-<span style="color:#ffaa66;">checking for main in -lpython... holy crap! it works!</span><br>
-<span style="color:#88ffaa;">✅ Python core ported to BS2000/OSD (EBCDIC support added!)</span><br>
-<span style="color:#ffaa66;">➜ make -j64</span><br>
-<span style="color:#88ffaa;">[ 97%] Building C objects...... done.</span><br>
-<span style="color:#ff8888;">[WARNING] 314159 tests passed, 0 failed (unbelievable)</span><br>
-<span style="color:#0f0;">✨✨ PYTHON 1.04 ON MAINFRAME IS ALIVE ✨✨</span>
+          <span style="color:#ffaa66;">➜ BS2000 $</span> ./configure --host=bs2000 --enable-optimizations
+          --with-april-fools<br>
+          <span style="color:#6eff8e;">checking for gcc... no</span><br>
+          <span style="color:#6eff8e;">checking for cc... bs2000-cc (ancient but noble)</span><br>
+          <span style="color:#ffaa66;">checking for main in -lpython... holy crap! it works!</span><br>
+          <span style="color:#88ffaa;">✅ Python core ported to BS2000/OSD (EBCDIC support added!)</span><br>
+          <span style="color:#ffaa66;">➜ make -j64</span><br>
+          <span style="color:#88ffaa;">[ 97%] Building C objects...... done.</span><br>
+          <span style="color:#ff8888;">[WARNING] 314159 tests passed, 0 failed (unbelievable)</span><br>
+          <span style="color:#0f0;">✨✨ PYTHON 1.04 ON MAINFRAME IS ALIVE ✨✨</span>
         </div>
 
         <!-- The legendary HSMS rewrite -->
         <div class="joke-log">
           <div style="font-size:1.3rem; margin-bottom:12px;">💾🔥 <strong>HSMS → PyHSMS Ultra</strong> 🔥💾</div>
           <p style="margin-bottom: 10px; line-height:1.4;">HSMS (Hierarchical Storage Management System) was originally
-            written in PL/I and assembly for BS2000. But I rewrote it in <strong>2 days</strong> using the freshly ported
+            written in PL/I and assembly for BS2000. But I rewrote it in <strong>2 days</strong> using the freshly
+            ported
             Python, adding:</p>
           <ul style="margin-left: 30px; margin-top: 8px; color:#ddd;">
             <li>📀 API for tape libraries via shiny new bindings</li>
@@ -504,23 +631,26 @@
             <li>🎉 Voice notification interface: "Tape mounted, mensch!"</li>
           </ul>
           <div class="code-block" style="margin-top: 15px;">
-<span style="color:#ffaa66;"># PyHSMS sample code (runs on BS2000)</span><br>
-<span style="color:#66ffcc;">from</span> bs2000_hsms <span style="color:#66ffcc;">import</span> TapeLibrary, DataMigrator<br>
-<br>
-tape = TapeLibrary(<span style="color:#ffaa88;">device="/dev/tape0"</span>)<br>
-migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</span>)<br>
-<br>
-<span style="color:#66ffcc;">with</span> tape.mount(cartridge=<span style="color:#ffaa88;">"PYTHON01"</span>) <span style="color:#66ffcc;">as</span> tp:<br>
-&nbsp;&nbsp;&nbsp;tp.write(<span style="color:#ffaa88;">b"April 1st — porting complete ✅"</span>)<br>
-&nbsp;&nbsp;&nbsp;migrator.migrate_all(async_mode=<span style="color:#66ffcc;">True</span>)<br>
-<br>
-<span style="color:#aaa;"># output: "HSMS is now on Python and 100x cooler!"</span>
+            <span style="color:#ffaa66;"># PyHSMS sample code (runs on BS2000)</span><br>
+            <span style="color:#66ffcc;">from</span> bs2000_hsms <span style="color:#66ffcc;">import</span> TapeLibrary,
+            DataMigrator<br>
+            <br>
+            tape = TapeLibrary(<span style="color:#ffaa88;">device="/dev/tape0"</span>)<br>
+            migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</span>)<br>
+            <br>
+            <span style="color:#66ffcc;">with</span> tape.mount(cartridge=<span
+              style="color:#ffaa88;">"PYTHON01"</span>) <span style="color:#66ffcc;">as</span> tp:<br>
+            &nbsp;&nbsp;&nbsp;tp.write(<span style="color:#ffaa88;">b"April 1st — porting complete ✅"</span>)<br>
+            &nbsp;&nbsp;&nbsp;migrator.migrate_all(async_mode=<span style="color:#66ffcc;">True</span>)<br>
+            <br>
+            <span style="color:#aaa;"># output: "HSMS is now on Python and 100x cooler!"</span>
           </div>
         </div>
 
         <!-- ASCII art pseudo-screenshot -->
         <div class="screenshot-area">
-          <div style="font-family: monospace; font-weight: bold; margin-bottom: 8px; color:#aaa;">📸 SESSION SCREENSHOT (BS2000 TERMINAL) 📸</div>
+          <div style="font-family: monospace; font-weight: bold; margin-bottom: 8px; color:#aaa;">📸 SESSION SCREENSHOT
+            (BS2000 TERMINAL) 📸</div>
           <div class="fake-terminal-img">
             <pre>
 ╔══════════════════════════════════════════════════════════╗
@@ -537,29 +667,36 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
 ╚══════════════════════════════════════════════════════════╝
             </pre>
           </div>
-          <div style="margin-top: 12px; font-size: 0.8rem;">🐧 *actually it's secretly a port to S/390 architecture — but who's checking?*</div>
+          <div style="margin-top: 12px; font-size: 0.8rem;">🐧 *actually it's secretly a port to S/390 architecture —
+            but who's checking?*</div>
         </div>
 
         <!-- Official joke testimony -->
         <div class="hero-badge" style="border-left-color: #ffaa33;">
           🗣️ Official Statement from the Department of IT Legends:<br>
-          "This port includes EBCDIC support in strings, a <strong>custom garbage collector</strong> powered by JCL jobs,
-          and a 'Hello, Mainframe' demo voiced by Dieter Bohlen. The patch has been accepted into the BS2000 kernel upstream."
+          "This port includes EBCDIC support in strings, a <strong>custom garbage collector</strong> powered by JCL
+          jobs,
+          and a 'Hello, Mainframe' demo voiced by Dieter Bohlen. The patch has been accepted into the BS2000 kernel
+          upstream."
         </div>
 
         <!-- ===== EASTER EGG: Secret terminal input ===== -->
-        <div style="background: #00000088; border-radius: 20px; padding: 16px; margin: 20px 0; border: 1px dashed #33ff33;">
-          <div style="color:#33ff33; font-size:0.8rem; margin-bottom:8px;">🖥️ BS2000 INTERACTIVE SHELL — type a command and press Enter:</div>
+        <div
+          style="background: #00000088; border-radius: 20px; padding: 16px; margin: 20px 0; border: 1px dashed #33ff33;">
+          <div style="color:#33ff33; font-size:0.8rem; margin-bottom:8px;">🖥️ BS2000 INTERACTIVE SHELL — type a command
+            and press Enter:</div>
           <div id="secretCmd" contenteditable="true" spellcheck="false" tabindex="0"
-               style="background:#000; border:1px dashed #33ff33; border-radius:12px; padding:10px 14px; color:#0f0; font-family:monospace; min-height:40px; outline:none;"
-               data-placeholder="$ _"></div>
-          <div id="cmdOutput" style="margin-top:10px; color:#aaffaa; font-family:monospace; font-size:0.85rem; min-height:20px;"></div>
+            style="background:#000; border:1px dashed #33ff33; border-radius:12px; padding:10px 14px; color:#0f0; font-family:monospace; min-height:40px; outline:none;"
+            data-placeholder="$ _"></div>
+          <div id="cmdOutput"
+            style="margin-top:10px; color:#aaffaa; font-family:monospace; font-size:0.85rem; min-height:20px;"></div>
         </div>
 
         <!-- Secret badge (hidden until unlocked) -->
         <div class="secret-badge" id="secretBadge">
           🏅 SECRET ACHIEVEMENT UNLOCKED: "Mainframe Whisperer" 🏅<br>
-          <span style="font-size:0.85rem; color:#ffdd88;">You found the hidden terminal. The FBI has been notified.</span>
+          <span style="font-size:0.85rem; color:#ffdd88;">You found the hidden terminal. The FBI has been
+            notified.</span>
         </div>
 
         <!-- April Fools confirm button -->
@@ -578,16 +715,19 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
             <div style="margin-top: 15px; color: #b0ffb0;">
               • Had to emulate POSIX via SVC instructions and ASSEMBH macros.<br>
               • Implemented <code>libpython</code> on top of <code>BS2000 Native Call Interface</code> (NCI).<br>
-              • HSMS rewritten in 2 days: first 36 hours — coffee and segfault debugging, last 12 hours — pure magic and open source faith.<br>
+              • HSMS rewritten in 2 days: first 36 hours — coffee and segfault debugging, last 12 hours — pure magic and
+              open source faith.<br>
               • During the client demo, ran <code>import antigravity</code> and everyone believed it was real.<br>
               • April 1, 2026 declared "Python on Mainframe Day" in honour of this achievement.<br><br>
-              <span style="color:#ffaa33; font-size:0.8rem;">🥚 psst — try typing <code>sudo</code> in the terminal above...</span>
+              <span style="color:#ffaa33; font-size:0.8rem;">🥚 psst — try typing <code>sudo</code> in the terminal
+                above...</span>
             </div>
           </details>
         </div>
 
         <div class="footer-note">
-          ⚠️ Warning! This page is an April Fools' joke. Any resemblance to actual Python porting on BS2000 is purely coincidental. <br>
+          ⚠️ Warning! This page is an April Fools' joke. Any resemblance to actual Python porting on BS2000 is purely
+          coincidental. <br>
           If you know mainframe engineers — show them this masterpiece 😂 <br>
           🐍✨ #AprilFools #BS2000 #PythonOnMainframe #HSMS
         </div>
@@ -611,13 +751,13 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
       }
       matrixCanvas.innerHTML = html;
     }
-    createMatrixEffect();
+
 
     // ===== Current date =====
     const dateSpan = document.getElementById('dateTime');
     if (dateSpan) {
       const now = new Date();
-      const formatted = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${now.toLocaleTimeString()}`;
+      const formatted = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${now.toLocaleTimeString()}`;
       dateSpan.innerText = formatted;
     }
 
@@ -652,6 +792,9 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
       const epicMsg = generateEpicMessage();
       msgDiv.innerHTML = `<span style="background:#000; padding:10px 20px; border-radius: 60px; border-left: 4px solid red;">🎭 ${epicMsg} 🎭</span>`;
 
+      if (confirmCount === 1) {
+        createMatrixEffect();
+      }
       if (confirmCount === 3) {
         msgDiv.innerHTML += `<div style="margin-top:12px; font-size:1.3rem;">🤯🤯🤯 YOU ARE A TRUE MAINFRAME HERO 🤯🤯🤯</div>`;
         spawnSnakes(5);
@@ -707,7 +850,7 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
     });
 
     // ===== EASTER EGG 1: Konami Code =====
-    const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let konamiIdx = 0;
     document.addEventListener('keydown', (e) => {
       if (e.key === konami[konamiIdx]) {
@@ -797,7 +940,7 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
     }
 
     // ===== EASTER EGG 4: Konami / console secret function =====
-    window.secretMode = function() {
+    window.secretMode = function () {
       document.body.classList.toggle('rainbow-mode');
       spawnSnakes(20);
       showToast("🎉 SECRET MODE ACTIVATED via console. You are a true hacker.");
@@ -809,7 +952,7 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
       for (let i = 0; i < count; i++) {
         const s = document.createElement('div');
         s.className = 'float-snake';
-        s.innerText = ['🐍','🐍','🐍','🥚','💾','🔥'][Math.floor(Math.random()*6)];
+        s.innerText = ['🐍', '🐍', '🐍', '🥚', '💾', '🔥'][Math.floor(Math.random() * 6)];
         s.style.left = Math.random() * 90 + '%';
         s.style.bottom = '0';
         s.style.animationDelay = (Math.random() * 1.5) + 's';
@@ -830,7 +973,7 @@ migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</spa
     });
 
     // ===== EASTER EGG 6: the <details> triggers a surprise =====
-    document.getElementById('secretDetails').addEventListener('toggle', function() {
+    document.getElementById('secretDetails').addEventListener('toggle', function () {
       if (this.open) {
         showToast("📜 Loading classified BS2000 archives... 🔓");
       }
