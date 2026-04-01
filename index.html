@@ -1,366 +1,431 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 КАК Я ПОРТИРОВАЛ PYTHON НА BS2000! И ПЕРЕПИСАЛ HSMS ЗА 2 ДНЯ!</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔥 КАК Я ПОРТИРОВАЛ PYTHON НА BS2000! И ПЕРЕПИСАЛ HSMS ЗА 2 ДНЯ!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            background: linear-gradient(135deg, #0a0f1e 0%, #1a1f2e 100%);
-            min-height: 100vh;
-            font-family: 'Courier New', 'Fira Code', 'Monaco', monospace;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #1a1f2e 100%);
+      min-height: 100vh;
+      font-family: 'Courier New', 'Fira Code', 'Monaco', monospace;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
 
-        /* матричный дождь из символов (стилизованный) */
-        .matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.08;
-            font-family: monospace;
-            font-size: 18px;
-            color: #0f0;
-        }
+    /* матричный дождь из символов (стилизованный) */
+    .matrix-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 6;
+      /* ← увеличено с 0.08 до 0.25 */
+      font-family: monospace;
+      font-size: 20px;
+      /* ← увеличено с 18px */
+      font-weight: bold;
+      color: #0f0;
+      /* ← ярко-зелёный остаётся */
+      text-shadow: 0 0 3px #0f0;
+      /* ← добавить свечение */
+    }
 
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-        /* главная карточка с "отчетом" */
-        .report-card {
-            background: rgba(10, 20, 15, 0.92);
-            backdrop-filter: blur(4px);
-            border: 2px solid #ff4d4d;
-            border-radius: 32px;
-            box-shadow: 0 0 0 4px #330000, 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(255,0,0,0.3);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
+    /* главная карточка с "отчетом" */
+    .report-card {
+      background: rgba(10, 20, 15, 0.92);
+      backdrop-filter: blur(4px);
+      border: 2px solid #ff4d4d;
+      border-radius: 32px;
+      box-shadow: 0 0 0 4px #330000, 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 0, 0, 0.3);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
 
-        /* терминальная шапка */
-        .terminal-bar {
-            background: #1e1e1e;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 2px solid #ff4d4d;
-            font-family: monospace;
-        }
+    /* терминальная шапка */
+    .terminal-bar {
+      background: #1e1e1e;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #ff4d4d;
+      font-family: monospace;
+    }
 
-        .win-dots {
-            display: flex;
-            gap: 8px;
-        }
+    .win-dots {
+      display: flex;
+      gap: 8px;
+    }
 
-        .dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-        }
-        .dot.red { background: #ff5f56; }
-        .dot.yellow { background: #ffbd2e; }
-        .dot.green { background: #27c93f; }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+    }
 
-        .terminal-title {
-            color: #aaa;
-            font-size: 0.9rem;
-            flex: 1;
-            text-align: center;
-            letter-spacing: 1px;
-        }
+    .dot.red {
+      background: #ff5f56;
+    }
 
-        .terminal-title span {
-            color: #ff8888;
-            font-weight: bold;
-        }
+    .dot.yellow {
+      background: #ffbd2e;
+    }
 
-        /* контент */
-        .content {
-            padding: 35px 30px 40px;
-        }
+    .dot.green {
+      background: #27c93f;
+    }
 
-        h1 {
-            font-family: monospace;
-            font-size: 1.9rem;
-            text-align: center;
-            color: #ff6666;
-            text-shadow: 0 0 6px #ff0000, 0 0 2px #aa0000;
-            background: #00000066;
-            display: inline-block;
-            width: 100%;
-            padding: 15px;
-            border-radius: 60px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            border: 1px dashed #ff6666;
-        }
+    .terminal-title {
+      color: #aaa;
+      font-size: 0.9rem;
+      flex: 1;
+      text-align: center;
+      letter-spacing: 1px;
+    }
 
-        .glitch-text {
-            animation: glitch 1.2s infinite;
-        }
+    .terminal-title span {
+      color: #ff8888;
+      font-weight: bold;
+    }
 
-        @keyframes glitch {
-            0%, 100% { text-shadow: 2px 0 red, -2px 0 blue; }
-            25% { text-shadow: -2px 0 cyan, 2px 0 magenta; }
-            50% { text-shadow: 3px 0 lime, -1px 0 yellow; }
-            75% { text-shadow: -3px 0 orange, 1px 0 purple; }
-        }
+    /* контент */
+    .content {
+      padding: 35px 30px 40px;
+    }
 
-        .hero-badge {
-            background: #000000aa;
-            border-left: 8px solid #ff4444;
-            padding: 20px;
-            margin: 20px 0;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #0f0;
-            font-family: monospace;
-        }
+    h1 {
+      font-family: monospace;
+      font-size: 1.9rem;
+      text-align: center;
+      color: #ff6666;
+      text-shadow: 0 0 6px #ff0000, 0 0 2px #aa0000;
+      background: #00000066;
+      display: inline-block;
+      width: 100%;
+      padding: 15px;
+      border-radius: 60px;
+      margin-bottom: 30px;
+      letter-spacing: -1px;
+      border: 1px dashed #ff6666;
+    }
 
-        .stats-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 35px 0;
-            justify-content: center;
-        }
+    .glitch-text {
+      animation: glitch 1.2s infinite;
+    }
 
-        .stat-card {
-            background: #0a0f0c;
-            border: 1px solid #ff6666;
-            border-radius: 24px;
-            padding: 18px 22px;
-            flex: 1;
-            min-width: 170px;
-            text-align: center;
-            box-shadow: 0 5px 0 #4a0000;
-        }
+    @keyframes glitch {
 
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #ff8888;
-            font-family: monospace;
-            text-shadow: 0 0 5px red;
-        }
+      0%,
+      100% {
+        text-shadow: 2px 0 red, -2px 0 blue;
+      }
 
-        .stat-label {
-            color: #ccc;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+      25% {
+        text-shadow: -2px 0 cyan, 2px 0 magenta;
+      }
 
-        .code-block {
-            background: #0b0f12;
-            padding: 20px;
-            border-radius: 20px;
-            border-left: 6px solid #ff4d4d;
-            font-family: monospace;
-            font-size: 0.85rem;
-            margin: 25px 0;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            color: #bbffaa;
-        }
+      50% {
+        text-shadow: 3px 0 lime, -1px 0 yellow;
+      }
 
-        .joke-log {
-            background: #000000aa;
-            border-radius: 28px;
-            padding: 20px;
-            margin: 25px 0;
-            border: 1px solid #ffa500;
-            color: #ccc;
-        }
+      75% {
+        text-shadow: -3px 0 orange, 1px 0 purple;
+      }
+    }
 
-        .button-meme {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0 20px;
-        }
+    .hero-badge {
+      background: #000000aa;
+      border-left: 8px solid #ff4444;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #0f0;
+      font-family: monospace;
+    }
 
-        .panic-btn {
-            background: linear-gradient(45deg, #aa2e2e, #ff4d4d);
-            border: none;
-            font-family: monospace;
-            font-size: 1.4rem;
-            font-weight: bold;
-            padding: 16px 32px;
-            border-radius: 60px;
-            color: white;
-            cursor: pointer;
-            transition: 0.1s linear;
-            box-shadow: 0 8px 0 #4a0000;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 35px 0;
+      justify-content: center;
+    }
 
-        .panic-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 4px 0 #4a0000;
-        }
+    .stat-card {
+      background: #0a0f0c;
+      border: 1px solid #ff6666;
+      border-radius: 24px;
+      padding: 18px 22px;
+      flex: 1;
+      min-width: 170px;
+      text-align: center;
+      box-shadow: 0 5px 0 #4a0000;
+    }
 
-        .screenshot-area {
-            text-align: center;
-            margin: 30px 0;
-            background: #00000066;
-            border-radius: 32px;
-            padding: 20px;
-        }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #ff8888;
+      font-family: monospace;
+      text-shadow: 0 0 5px red;
+    }
 
-        .fake-terminal-img {
-            background: #010101;
-            border-radius: 24px;
-            padding: 18px;
-            font-family: monospace;
-            text-align: left;
-            border: 1px solid #ffaa33;
-            max-width: 100%;
-            overflow-x: auto;
-        }
+    .stat-label {
+      color: #ccc;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
 
-        .fake-terminal-img pre {
-            color: #6eff8e;
-            font-size: 0.8rem;
-            white-space: pre-wrap;
-        }
+    .code-block {
+      background: #0b0f12;
+      padding: 20px;
+      border-radius: 20px;
+      border-left: 6px solid #ff4d4d;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin: 25px 0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      color: #bbffaa;
+    }
 
-        .footer-note {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.75rem;
-            color: #ffaa88;
-            border-top: 1px dashed #ff6644;
-            padding-top: 25px;
-        }
+    .joke-log {
+      background: #000000aa;
+      border-radius: 28px;
+      padding: 20px;
+      margin: 25px 0;
+      border: 1px solid #ffa500;
+      color: #ccc;
+    }
 
-        .blink {
-            animation: blink-animation 1s step-end infinite;
-        }
+    .button-meme {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0 20px;
+    }
 
-        @keyframes blink-animation {
-            50% { opacity: 0; }
-        }
+    .panic-btn {
+      background: linear-gradient(45deg, #aa2e2e, #ff4d4d);
+      border: none;
+      font-family: monospace;
+      font-size: 1.4rem;
+      font-weight: bold;
+      padding: 16px 32px;
+      border-radius: 60px;
+      color: white;
+      cursor: pointer;
+      transition: 0.1s linear;
+      box-shadow: 0 8px 0 #4a0000;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
 
-        @media (max-width: 700px) {
-            .content { padding: 20px; }
-            h1 { font-size: 1.3rem; }
-            .stat-number { font-size: 1.8rem; }
-        }
-    </style>
+    .panic-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #4a0000;
+    }
+
+    .screenshot-area {
+      text-align: center;
+      margin: 30px 0;
+      background: #00000066;
+      border-radius: 32px;
+      padding: 20px;
+    }
+
+    .fake-terminal-img {
+      background: #010101;
+      border-radius: 24px;
+      padding: 18px;
+      font-family: monospace;
+      text-align: left;
+      border: 1px solid #ffaa33;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .fake-terminal-img pre {
+      color: #6eff8e;
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.75rem;
+      color: #ffaa88;
+      border-top: 1px dashed #ff6644;
+      padding-top: 25px;
+    }
+
+    .blink {
+      animation: blink-animation 1s step-end infinite;
+    }
+
+    @keyframes blink-animation {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .content {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+      }
+    }
+
+    @keyframes fadeMatrix {
+      0% {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+
+      20% {
+        opacity: 0.7;
+      }
+
+      80% {
+        opacity: 0.5;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+    }
+  </style>
 </head>
-<body>
-<div class="matrix-bg" id="matrixCanvas"></div>
 
-<div class="container">
+<body>
+  <div class="matrix-bg" id="matrixCanvas"></div>
+
+  <div class="container">
     <div class="report-card">
-        <div class="terminal-bar">
-            <div class="win-dots">
-                <div class="dot red"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-            </div>
-            <div class="terminal-title">
-                📡 ROOT@BS2000-SYSTEM:~<span>/dev/hero</span>
-            </div>
-            <div>🐍⚡</div>
+      <div class="terminal-bar">
+        <div class="win-dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="terminal-title">
+          📡 ROOT@BS2000-SYSTEM:~<span>/dev/hero</span>
+        </div>
+        <div>🐍⚡</div>
+      </div>
+
+      <div class="content">
+        <h1 class="glitch-text">
+          🚨 КАК Я ПОРТИРОВАЛ PYTHON 1.04 НА BS2000/OSD <br>
+          И ПЕРЕПИСАЛ HSMS ЗА 48 ЧАСОВ!
+        </h1>
+
+        <div class="hero-badge">
+          ⚡ [SYSTEM LOG] ⚡ <span id="dateTime"></span> — HELLO BS2000 PYTHON 1.04! ⚡
         </div>
 
-        <div class="content">
-            <h1 class="glitch-text">
-                🚨 КАК Я ПОРТИРОВАЛ PYTHON 1.04 НА BS2000/OSD <br>
-                И ПЕРЕПИСАЛ HSMS ЗА 48 ЧАСОВ!
-            </h1>
+        <!-- Статистика абсурда -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">2.3K</div>
+            <div class="stat-label">строк кода на ассемблере S/273</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">⚡16</div>
+            <div class="stat-label">чашек кофе + беруши</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0x1F4</div>
+            <div class="stat-label">ошибок сегментации (исправлено)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">🐍💾</div>
+            <div class="stat-label">Python работает на мейнфрейме</div>
+          </div>
+        </div>
 
-            <div class="hero-badge">
-                ⚡ [SYSTEM LOG] ⚡ <span id="dateTime"></span> — HELLO BS2000 PYTHON 1.04! ⚡
-            </div>
+        <!-- Генерация фейкового лога компиляции -->
+        <div class="code-block">
+          <span style="color:#ffaa66;">➜ BS2000 $</span> ./configure --host=bs2000 --enable-optimizations
+          --with-april-fools<br>
+          <span style="color:#6eff8e;">checking for gcc... no</span><br>
+          <span style="color:#6eff8e;">checking for cc... bs2000-cc (ancient but noble)</span><br>
+          <span style="color:#ffaa66;">checking for main in -lpython... holy crap! it works!</span><br>
+          <span style="color:#88ffaa;">✅ Python core ported to BS2000/OSD (EBCDIC support added!)</span><br>
+          <span style="color:#ffaa66;">➜ make -j64</span><br>
+          <span style="color:#88ffaa;">[ 97%] Building C objects...... done.</span><br>
+          <span style="color:#ff8888;">[WARNING] 314159 tests passed, 0 failed (unbelievable)</span><br>
+          <span style="color:#0f0;">✨✨ PYTHON 3.13 ON MAINFRAME IS ALIVE ✨✨</span>
+        </div>
 
-            <!-- Статистика абсурда -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">2.3K</div>
-                    <div class="stat-label">строк кода на ассемблере S/273</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">⚡16</div>
-                    <div class="stat-label">чашек кофе + беруши</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0x1F4</div>
-                    <div class="stat-label">ошибок сегментации (исправлено)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">🐍💾</div>
-                    <div class="stat-label">Python работает на мейнфрейме</div>
-                </div>
-            </div>
+        <!-- Легендарное переписывание HSMS -->
+        <div class="joke-log">
+          <div style="font-size:1.3rem; margin-bottom:12px;">💾🔥 <strong>HSMS → PyHSMS Ultra</strong> 🔥💾</div>
+          <p style="margin-bottom: 10px; line-height:1.4;">HSMS (Hierarchical Storage Management System) изначально был
+            написан на PL/I и ассемблере для BS2000. Но я <strong>за 2 дня</strong> переписал его на свежепортированный
+            Python, добавив:</p>
+          <ul style="margin-left: 30px; margin-top: 8px; color:#ddd;">
+            <li>📀 API для ленточных библиотек через новые биндинги</li>
+            <li>🐍 Асинхронную миграцию данных (asyncio на мейнфрейме!)</li>
+            <li>🤖 ИИ-предиктор для HSM-политик (модель на 42 параметрах)</li>
+            <li>🎉 Интерфейс с голосовым оповещением "Tape mounted, mensch!"</li>
+          </ul>
+          <div class="code-block" style="margin-top: 15px;">
+            <span style="color:#ffaa66;"># пример кода PyHSMS (работает на BS2000)</span><br>
+            <span style="color:#66ffcc;">from</span> bs2000_hsms <span style="color:#66ffcc;">import</span> TapeLibrary,
+            DataMigrator<br>
+            <br>
+            tape = TapeLibrary(<span style="color:#ffaa88;">device="/dev/tape0"</span>)<br>
+            migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</span>)<br>
+            <br>
+            <span style="color:#66ffcc;">with</span> tape.mount(cartridge=<span
+              style="color:#ffaa88;">"PYTHON01"</span>) <span style="color:#66ffcc;">as</span> tp:<br>
+            &nbsp;&nbsp;&nbsp;tp.write(<span style="color:#ffaa88;">b"1 апреля - портирование завершено ✅"</span>)<br>
+            &nbsp;&nbsp;&nbsp;migrator.migrate_all(async_mode=<span style="color:#66ffcc;">True</span>)<br>
+            <br>
+            <span style="color:#aaa;"># вывод: "HSMS теперь на Python и в 100 раз круче!"</span>
+          </div>
+        </div>
 
-            <!-- Генерация фейкового лога компиляции -->
-            <div class="code-block">
-                <span style="color:#ffaa66;">➜ BS2000 $</span> ./configure --host=bs2000 --enable-optimizations --with-april-fools<br>
-                <span style="color:#6eff8e;">checking for gcc... no</span><br>
-                <span style="color:#6eff8e;">checking for cc... bs2000-cc (ancient but noble)</span><br>
-                <span style="color:#ffaa66;">checking for main in -lpython... holy crap! it works!</span><br>
-                <span style="color:#88ffaa;">✅ Python core ported to BS2000/OSD (EBCDIC support added!)</span><br>
-                <span style="color:#ffaa66;">➜ make -j64</span><br>
-                <span style="color:#88ffaa;">[ 97%] Building C objects...... done.</span><br>
-                <span style="color:#ff8888;">[WARNING] 314159 tests passed, 0 failed (unbelievable)</span><br>
-                <span style="color:#0f0;">✨✨ PYTHON 1.04 ON MAINFRAME IS ALIVE ✨✨</span>
-            </div>
-
-            <!-- Легендарное переписывание HSMS -->
-            <div class="joke-log">
-                <div style="font-size:1.3rem; margin-bottom:12px;">💾🔥 <strong>HSMS → PyHSMS Ultra</strong> 🔥💾</div>
-                <p style="margin-bottom: 10px; line-height:1.4;">HSMS (Hierarchical Storage Management System) изначально был написан на PL/I и ассемблере для BS2000. Но я <strong>за 2 дня</strong> переписал его на свежепортированный Python, добавив:</p>
-                <ul style="margin-left: 30px; margin-top: 8px; color:#ddd;">
-                    <li>📀 API для ленточных библиотек через новые биндинги</li>
-                    <li>🐍 Асинхронную миграцию данных (asyncio на мейнфрейме!)</li>
-                    <li>🤖 ИИ-предиктор для HSM-политик (модель на 42 параметрах)</li>
-                    <li>🎉 Интерфейс с голосовым оповещением "Tape mounted, mensch!"</li>
-                </ul>
-                <div class="code-block" style="margin-top: 15px;">
-                    <span style="color:#ffaa66;"># пример кода PyHSMS (работает на BS2000)</span><br>
-                    <span style="color:#66ffcc;">from</span> bs2000_hsms <span style="color:#66ffcc;">import</span> TapeLibrary, DataMigrator<br>
-                    <br>
-                    tape = TapeLibrary(<span style="color:#ffaa88;">device="/dev/tape0"</span>)<br>
-                    migrator = DataMigrator(policy=<span style="color:#ffaa88;">"APRIL_MADNESS"</span>)<br>
-                    <br>
-                    <span style="color:#66ffcc;">with</span> tape.mount(cartridge=<span style="color:#ffaa88;">"PYTHON01"</span>) <span style="color:#66ffcc;">as</span> tp:<br>
-                        &nbsp;&nbsp;&nbsp;tp.write(<span style="color:#ffaa88;">b"1 апреля - портирование завершено ✅"</span>)<br>
-                        &nbsp;&nbsp;&nbsp;migrator.migrate_all(async_mode=<span style="color:#66ffcc;">True</span>)<br>
-                    <br>
-                    <span style="color:#aaa;"># вывод: "HSMS теперь на Python и в 100 раз круче!"</span>
-                </div>
-            </div>
-
-            <!-- Эпичная картинка: генерация ASCII арта + псевдо-скриншот -->
-            <div class="screenshot-area">
-                <div style="font-family: monospace; font-weight: bold; margin-bottom: 8px; color:#aaa;">📸 СКРИНШОТ РАБОЧЕГО СЕАНСА (BS2000 TERMINAL) 📸</div>
-                <div class="fake-terminal-img">
-                    <pre>
+        <!-- Эпичная картинка: генерация ASCII арта + псевдо-скриншот -->
+        <div class="screenshot-area">
+          <div style="font-family: monospace; font-weight: bold; margin-bottom: 8px; color:#aaa;">📸 СКРИНШОТ РАБОЧЕГО
+            СЕАНСА (BS2000 TERMINAL) 📸</div>
+          <div class="fake-terminal-img">
+            <pre>
 ╔══════════════════════════════════════════════════════════╗
 ║   BS2000 OSD V11.0  -  Welcome, Python Prophet!          ║
 ╠══════════════════════════════════════════════════════════╣
 ║ $ python3 --version                                      ║
-║ Python 1.04.0-bs2000 (april-release, Apr 01 2026)        ║
+║ Python 3.13.0-bs2000 (april-release, Apr 01 2026)        ║
 ║ $ python3 -c "import hsms; hsms.demo_tape_mount()"       ║
 ║ [INFO] PyHSMS v2.0 initialized                           ║
 ║ [TAPE]  Drive SLR100 mounted: VOL=SER=APRIL1             ║
@@ -369,147 +434,155 @@
 ║ $ █                                                      ║
 ╚══════════════════════════════════════════════════════════╝
                     </pre>
-                </div>
-                <div style="margin-top: 12px; font-size: 0.8rem;">🐧 *на самом деле внутри скрывается порт на архитектуру S/390 — но кто проверял?*</div>
-            </div>
-
-            <!-- Шуточные свидетельства и первоапрельские свидетели -->
-            <div class="hero-badge" style="border-left-color: #ffaa33;">
-                🗣️ Официальное заявление отдела ИТ-легенд:<br>
-                «Данный порт включает поддержку EBCDIC в строках, <strong>собственный garbage collector</strong> на основе JCL-джобов и демонстрацию “Hello, Mainframe” с голосом Дитера Болена. Патч принят в upstream ядра BS2000.»
-            </div>
-
-            <!-- кнопка для первоапрельского "подтверждения" -->
-            <div class="button-meme">
-                <button class="panic-btn" id="confirmBtn">🔥 ПОДТВЕРДИТЬ ПОДВИГ 🔥</button>
-            </div>
-            <div id="confirmationMessage" style="text-align:center; font-family: monospace; font-weight: bold; margin-top: -10px; margin-bottom: 20px; min-height: 60px;color:#aaa;"></div>
-
-            <!-- Список абсурдных деталей -->
-            <div style="background: #00000066; border-radius: 20px; padding: 16px; margin-top: 10px;">
-                <details>
-                    <summary style="cursor: pointer; color: #ffaa88; font-weight: bold;">📜 [Секретные подробности порта] 📜</summary>
-                    <div style="margin-top: 15px; color: #b0ffb0;">
-                        • Пришлось эмулировать POSIX через SVC-инструкции и макросы ASSEMBH.<br>
-                        • Реализовал `libpython` поверх `BS2000 Native Call Interface` (NCI).<br>
-                        • HSMS переписан за 2 дня: первые 36 часов — кофе и отладка сегфолтов, последние 12 часов — магия и вера в open source.<br>
-                        • На презентации для заказчика запустил `import antigravity`, и все поверили.<br>
-                        • 1 апреля 2026 года объявлен днём "Python on Mainframe" в честь этого события.
-                    </div>
-                </details>
-            </div>
-
-            <div class="footer-note">
-                ⚠️ Внимание! Данная страница является первоапрельской шуткой. Любое сходство с реальным портированием Python на BS2000 — чистая случайность. <br>
-                Но если вы знаете мейнфреймщиков — покажите им этот шедевр 😂 <br>
-                🐍✨ #AprilFools #BS2000 #PythonOnMainframe #HSMS
-            </div>
+          </div>
+          <div style="margin-top: 12px; font-size: 0.8rem;">🐧 *на самом деле внутри скрывается порт на архитектуру
+            S/390 — но кто проверял?*</div>
         </div>
-    </div>
-</div>
 
-<script>
+        <!-- Шуточные свидетельства и первоапрельские свидетели -->
+        <div class="hero-badge" style="border-left-color: #ffaa33;">
+          🗣️ Официальное заявление отдела ИТ-легенд:<br>
+          «Данный порт включает поддержку EBCDIC в строках, <strong>собственный garbage collector</strong> на основе
+          JCL-джобов и демонстрацию “Hello, Mainframe” с голосом Дитера Болена. Патч принят в upstream ядра BS2000.»
+        </div>
+
+        <!-- кнопка для первоапрельского "подтверждения" -->
+        <div class="button-meme">
+          <button class="panic-btn" id="confirmBtn">🔥 ПОДТВЕРДИТЬ ПОДВИГ 🔥</button>
+        </div>
+        <div id="confirmationMessage"
+          style="text-align:center; font-family: monospace; font-weight: bold; margin-top: -10px; margin-bottom: 20px; min-height: 60px;color:#aaa;">
+        </div>
+
+        <!-- Список абсурдных деталей -->
+        <div style="background: #00000066; border-radius: 20px; padding: 16px; margin-top: 10px;">
+          <details>
+            <summary style="cursor: pointer; color: #ffaa88; font-weight: bold;">📜 [Секретные подробности порта] 📜
+            </summary>
+            <div style="margin-top: 15px; color: #b0ffb0;">
+              • Пришлось эмулировать POSIX через SVC-инструкции и макросы ASSEMBH.<br>
+              • Реализовал `libpython` поверх `BS2000 Native Call Interface` (NCI).<br>
+              • HSMS переписан за 2 дня: первые 36 часов — кофе и отладка сегфолтов, последние 12 часов — магия и вера в
+              open source.<br>
+              • На презентации для заказчика запустил `import antigravity`, и все поверили.<br>
+              • 1 апреля 2026 года объявлен днём "Python on Mainframe" в честь этого события.
+            </div>
+          </details>
+        </div>
+
+        <div class="footer-note">
+          ⚠️ Внимание! Данная страница является первоапрельской шуткой. Любое сходство с реальным портированием Python
+          на BS2000 — чистая случайность. <br>
+          Но если вы знаете мейнфреймщиков — покажите им этот шедевр 😂 <br>
+          🐍✨ #AprilFools #BS2000 #PythonOnMainframe #HSMS
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
     // Матричный фон из символов
     const matrixCanvas = document.getElementById('matrixCanvas');
     function createMatrixEffect() {
-        if (!matrixCanvas) return;
-        let symbols = "01⧠⧡⛭⚡🐍💾🔧";
-        let html = "";
-        for (let i = 0; i < 180; i++) {
-            let sym = symbols[Math.floor(Math.random() * symbols.length)];
-            let left = Math.random() * 100;
-            let top = Math.random() * 100;
-            let animDelay = Math.random() * 15;
-            html += `<div style="position:absolute; left:${left}%; top:${top}%; animation: fadeMatrix 8s infinite; animation-delay: ${animDelay}s; opacity:0.3;">${sym}</div>`;
-        }
-        matrixCanvas.innerHTML = html;
-        const style = document.createElement('style');
-        style.textContent = `
+      if (!matrixCanvas) return;
+      let symbols = "0123456789ABCDEF";
+      let html = "";
+      for (let i = 0; i < 180; i++) {
+        let sym = symbols[Math.floor(Math.random() * symbols.length)];
+        let left = Math.random() * 100;
+        let top = Math.random() * 100;
+        let animDelay = Math.random() * 15;
+        html += `<div style="position:absolute; left:${left}%; top:${top}%; animation: fadeMatrix 3s infinite; animation-delay: ${animDelay}s; opacity:0.3;">${sym}</div>`;
+      }
+      matrixCanvas.innerHTML = html;
+      const style = document.createElement('style');
+      style.textContent = `
             @keyframes fadeMatrix {
-                0% { opacity: 0; transform: translateY(-10px);}
+                0% { opacity: 0; transform: translateY(-100px);}
                 20% { opacity: 0.5; }
                 80% { opacity: 0.3; }
-                100% { opacity: 0; transform: translateY(20px);}
+                100% { opacity: 0; transform: translateY(200px);}
             }
         `;
-        document.head.appendChild(style);
+      document.head.appendChild(style);
     }
     createMatrixEffect();
 
     // текущая дата (первоапрельский контекст)
     const dateSpan = document.getElementById('dateTime');
     if (dateSpan) {
-        const now = new Date();
-        const formatted = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${now.toLocaleTimeString()}`;
-        dateSpan.innerText = formatted;
+      const now = new Date();
+      const formatted = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${now.toLocaleTimeString()}`;
+      dateSpan.innerText = formatted;
     }
 
     // кнопка первоапрельского подтверждения
     const confirmBtn = document.getElementById('confirmBtn');
     const msgDiv = document.getElementById('confirmationMessage');
     let confirmCount = 0;
-    
+
     function generateEpicMessage() {
-        const messages = [
-            "✅ ПОДТВЕРЖДЕНО! Сенат мейнфреймеров аплодирует стоя! 🎉",
-            "⚡ Тим Кук попросил портировать Swift на BS2000, но вы отказались. Вы — легенда! 🐍💪",
-            "📀 Интеграция с HSMS прошла успешно. Ленточные библиотеки поют оду Python! 🎶",
-            "🔥 Гвидо ван Россум поставил лайк и сказал: 'Это безумие, но мне нравится'.",
-            "🤣 1 апреля — ваша шутка официально признана техническим подвигом года!",
-            "🚨 Система BS2000 выдала ошибку: 'Слишком много юмора, перезагрузка через 10 лет' 🤖",
-            "🏆 Вам вручается орден 'Почетный инженер первоапрельского безумия'!"
-        ];
-        return messages[Math.floor(Math.random() * messages.length)];
+      const messages = [
+        "✅ ПОДТВЕРЖДЕНО! Сенат мейнфреймеров аплодирует стоя! 🎉",
+        "⚡ Тим Кук попросил портировать Swift на BS2000, но вы отказались. Вы — легенда! 🐍💪",
+        "📀 Интеграция с HSMS прошла успешно. Ленточные библиотеки поют оду Python! 🎶",
+        "🔥 Гвидо ван Россум поставил лайк и сказал: 'Это безумие, но мне нравится'.",
+        "🤣 1 апреля — ваша шутка официально признана техническим подвигом года!",
+        "🚨 Система BS2000 выдала ошибку: 'Слишком много юмора, перезагрузка через 10 лет' 🤖",
+        "🏆 Вам вручается орден 'Почетный инженер первоапрельского безумия'!"
+      ];
+      return messages[Math.floor(Math.random() * messages.length)];
     }
 
     confirmBtn.addEventListener('click', () => {
-        confirmCount++;
-        const epicMsg = generateEpicMessage();
-        msgDiv.innerHTML = `<span style="background:#000; padding:10px 20px; border-radius: 60px; border-left: 4px solid red;">🎭 ${epicMsg} 🎭</span>`;
-        if (confirmCount === 3) {
-            msgDiv.innerHTML += `<div style="margin-top:12px; font-size:1.3rem;">🤯🤯🤯 ВЫ НАСТОЯЩИЙ ГЕРОЙ МЭЙНФРЕЙМА 🤯🤯🤯</div>`;
-        }
-        if (confirmCount >= 5) {
-            msgDiv.innerHTML += `<div style="margin-top:15px;"><img style="max-width:100px;" src="https://media1.tenor.com/m/mCiM7WGGPmsAAAAC/python.gif" onerror="this.style.display='none'"><br><span style="color:#ffaa66;">🐍 Питон на мейнфрейме танцует джигу!</span></div>`;
-        }
-        // добавим фейковый звук в консоль
-        console.log("%c🔥🔥🔥 ПОДВИГ ЗАСЧИТАН! Python на BS2000 реальность 🔥🔥🔥", "color: #ff6666; font-size: 16px; font-weight: bold;");
-        const terminalTitle = document.querySelector('.terminal-title');
-        if (terminalTitle && confirmCount === 2) {
-            terminalTitle.innerHTML = "✨🔥 PYTHON/BS2000 ONLINE 🔥✨";
-            setTimeout(() => {
-                terminalTitle.innerHTML = "📡 ROOT@BS2000-SYSTEM:~<span>/dev/hero</span>";
-            }, 2000);
-        }
+      confirmCount++;
+      const epicMsg = generateEpicMessage();
+      msgDiv.innerHTML = `<span style="background:#000; padding:10px 20px; border-radius: 60px; border-left: 4px solid red;">🎭 ${epicMsg} 🎭</span>`;
+      if (confirmCount === 3) {
+        msgDiv.innerHTML += `<div style="margin-top:12px; font-size:1.3rem;">🤯🤯🤯 ВЫ НАСТОЯЩИЙ ГЕРОЙ МЭЙНФРЕЙМА 🤯🤯🤯</div>`;
+      }
+      if (confirmCount >= 5) {
+        msgDiv.innerHTML += `<div style="margin-top:15px;"><img style="max-width:100px;" src="https://tenor.com/view/python-gif-27676891" onerror="this.style.display='none'"><br><span style="color:#ffaa66;">🐍 Питон на мейнфрейме танцует джигу!</span></div>`;
+      }
+      // добавим фейковый звук в консоль
+      console.log("%c🔥🔥🔥 ПОДВИГ ЗАСЧИТАН! Python на BS2000 реальность 🔥🔥🔥", "color: #ff6666; font-size: 16px; font-weight: bold;");
+      const terminalTitle = document.querySelector('.terminal-title');
+      if (terminalTitle && confirmCount === 2) {
+        terminalTitle.innerHTML = "✨🔥 PYTHON/BS2000 ONLINE 🔥✨";
+        setTimeout(() => {
+          terminalTitle.innerHTML = "📡 ROOT@BS2000-SYSTEM:~<span>/dev/hero</span>";
+        }, 2000);
+      }
     });
 
     // добавим случайный эффект "мерцания курсора" в фейковом терминале
     const fakePre = document.querySelector('.fake-terminal-img pre');
     if (fakePre) {
-        let cursorBlink = setInterval(() => {
-            let text = fakePre.innerHTML;
-            let cur_str = '║ $ █                                                      ║'
-            let no_cur_str = '║ $                                                        ║'
-            if (text.includes(cur_str)) {
-                fakePre.innerHTML = text.replace(cur_str, no_cur_str);
-            } else {
-                fakePre.innerHTML = text.replace(no_cur_str, cur_str);
-            }
-        }, 800);
-        setTimeout(() => clearInterval(cursorBlink), 20000);
+      let cursorBlink = setInterval(() => {
+        let text = fakePre.innerHTML;
+        let cur_str = '║ $ █                                                      ║'
+        let no_cur_str = '║ $                                                        ║'
+        if (text.includes(cur_str)) {
+          fakePre.innerHTML = text.replace(cur_str, no_cur_str);
+        } else {
+          fakePre.innerHTML = text.replace(no_cur_str, cur_str);
+        }
+      }, 800);
+      setTimeout(() => clearInterval(cursorBlink), 20000);
     }
 
     // мелкая подпись с первоапрельским предупреждением при загрузке
     window.addEventListener('load', () => {
-        setTimeout(() => {
-            if (msgDiv && !msgDiv.innerHTML) {
-                msgDiv.innerHTML = '<span style="background:#330000; padding:5px 12px; border-radius:30px;">💡 Нажми на красную кнопку — подтверди легенду о портировании Python на BS2000 💡</span>';
-                setTimeout(() => {
-                    if (msgDiv.innerHTML.includes('💡')) msgDiv.innerHTML = '';
-                }, 4000);
-            }
-        }, 1500);
+      setTimeout(() => {
+        if (msgDiv && !msgDiv.innerHTML) {
+          msgDiv.innerHTML = '<span style="background:#330000; padding:5px 12px; border-radius:30px;">💡 Нажми на красную кнопку — подтверди легенду о портировании Python на BS2000 💡</span>';
+          setTimeout(() => {
+            if (msgDiv.innerHTML.includes('💡')) msgDiv.innerHTML = '';
+          }, 4000);
+        }
+      }, 1500);
     });
-</script>
+  </script>
 </body>
+
 </html>
